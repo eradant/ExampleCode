@@ -1,0 +1,48 @@
+import time
+import board
+import busio
+import displayio
+import terminalio
+from adafruit_display_text import label
+import adafruit_displayio_ssd1306
+import adafruit_sht4x
+
+displayio.release_displays()
+
+i2c_oled = busio.I2C(scl=board.GP3, sda=board.GP2)
+display_bus = displayio.I2CDisplay(i2c_oled, device_address=0x3C)
+display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=64)
+
+i2c_sensor = busio.I2C(scl=board.GP5, sda=board.GP4)
+sht30 = adafruit_sht4x.SHT4x(i2c_sensor, address=0x44)
+
+while True:
+    print("\nTemp: {:.2f} C".format(sht30.temperature))
+    print("Humidity: {:.2f} %".format(sht30.relative_humidity))
+
+
+    # Make the display context
+    text_group = displayio.Group()
+
+    # Draw a label
+    text = "ENVIRONMENT SENSOR"
+    text_area = label.Label(terminalio.FONT, text=text, color=0xFFFFFF, x=10, y=4)
+    text_group.append(text_area)
+
+    text = "Temp (C):   {:.2f}".format(sht30.temperature)
+    text_area = label.Label(terminalio.FONT, text=text, color=0xFFFFFF, x=10, y=20)
+    text_group.append(text_area)
+
+    text = "Humi (%):   {:.2f}".format(sht30.relative_humidity)
+    text_area = label.Label(terminalio.FONT, text=text, color=0xFFFFFF, x=10, y=45)
+    text_group.append(text_area)
+
+    display.show(text_group)
+
+    time.sleep(2)
+
+
+
+
+
+
